@@ -1,17 +1,9 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-echo -e "-- BEGIN HAPROXY --\n"
+#https://github.com/justintime/vagrant-haproxy-demo/blob/master/haproxy-setup.sh
+/usr/bin/apt-get -y install haproxy
 
-echo -e "-- Installing HAProxy\n"
-apt-get install -y haproxy > /dev/null 2>&1
-
-echo -e "-- Enabling HAProxy as a start-up deamon\n"
-cat > /etc/default/haproxy <<EOF
-ENABLED=1
-EOF
-
-echo -e "-- Validating HAProxy configuration\n"
-haproxy -f haproxy.cfg -c
-
-echo -e "-- Starting HAProxy\n"
-service haproxy start
+cat > /etc/default/haproxy <<EOD
+EOD
+cp haproxy.cfg /etc/haproxy/haproxy.cfg.orig
+/usr/sbin/service haproxy restart
