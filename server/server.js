@@ -15,4 +15,3 @@ function serve(ip, port) {
 }
 
 serve ("0.0.0.0", 80);
-console.log("holi ")
