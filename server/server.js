@@ -1,13 +1,18 @@
-var http = require('http');
+var http = require('http'),
+    fs = require('fs');
 
-function serve(ip, port)
-{
-        http.createServer(function (req, res) {
-            res.writeHead(200, {'Content-Type': 'text/plain'});
-            res.write(JSON.stringify(req.headers));
-            res.end("\nThere's no place like "+ip+":"+port+"\n");
-        }).listen(port, ip);
-        console.log('Server running at http://'+ip+':'+port+'/');
+function serve(ip, port) {
+  fs.readFile('server.html', function (err, html) {
+      if (err) {
+          throw err;
+      }
+      http.createServer(function(request, response) {
+          response.writeHeader(200, {"Content-Type": "text/html"});
+          response.write(html);
+          response.end();
+      }).listen(port, ip);
+    });
 }
 
-serve ("127.0.0.1", 80);
+serve ("0.0.0.0", 80);
+console.log("holi ")

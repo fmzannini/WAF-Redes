@@ -7,8 +7,9 @@ Vagrant.configure("2") do |config|
             vb_config.name = "Web Server 1"
         end
         webserver1_config.vm.hostname = "webserver1"
-        webserver1_config.vm.network "private_network", ip: "192.168.40.40"
+        webserver1_config.vm.network "private_network", ip: "192.168.33.80"
         webserver1_config.vm.provision "file", source: "./server/server.js", destination: "server.js"
+        webserver1_config.vm.provision "file", source: "./server/server1.html", destination: "server.html"
         webserver1_config.vm.provision :shell, path: "server/server.sh"
     end
 
@@ -18,8 +19,9 @@ Vagrant.configure("2") do |config|
             vb_config.name = "Web Server 2"
         end
         webserver2_config.vm.hostname = "webserver2"
-        webserver2_config.vm.network "private_network", ip: "192.168.33.20"
-        webserver2_config.vm.synced_folder "./server", "/server"
+        webserver2_config.vm.network "private_network", ip: "192.168.33.90"
+        webserver2_config.vm.provision "file", source: "./server/server.js", destination: "server.js"
+        webserver2_config.vm.provision "file", source: "./server/server2.html", destination: "server.html"
         webserver2_config.vm.provision :shell, path: "server/server.sh"
     end
 
@@ -30,7 +32,8 @@ Vagrant.configure("2") do |config|
         end
         haproxy_config.vm.hostname = "haproxy"
         haproxy_config.vm.network :forwarded_port, guest: 80, host: 8080
-        haproxy_config.vm.network "private_network", ip: "192.168.33.30"
+        haproxy_config.vm.network "private_network", ip: "192.168.33.70"
+        haproxy_config.vm.provision "file", source: "./haproxy/haproxy.cfg", destination: "haproxy.cfg"
         haproxy_config.vm.provision :shell, path: "haproxy/haproxy.sh"
     end
 end
