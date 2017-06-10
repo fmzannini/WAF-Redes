@@ -36,4 +36,14 @@ Vagrant.configure("2") do |config|
         haproxy_config.vm.provision "file", source: "./haproxy/haproxy.cfg", destination: "haproxy.cfg"
         haproxy_config.vm.provision :shell, path: "haproxy/haproxy.sh"
     end
+    # Configs for haproxy
+    config.vm.define :waf1 do |waf1_config|
+        waf1_config.vm.provider :virtualbox do |vb_config|
+            vb_config.name = "WAF 1"
+        end
+        waf1_config.vm.hostname = "waf1"
+        waf1_config.vm.network "private_network", ip: "192.168.33.60"
+        waf1_config.vm.provision "file", source: "./waf/httpd.conf", destination: "httpd.conf"
+        waf1_config.vm.provision :shell, path: "waf/waf.sh"
+    end
 end
