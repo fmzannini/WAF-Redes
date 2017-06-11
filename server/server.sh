@@ -30,4 +30,4 @@ echo -e "installing node"
 # npm i sequelize
 
 # server
-node server.js
+node server.js &

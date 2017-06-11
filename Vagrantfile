@@ -33,17 +33,27 @@ Vagrant.configure("2") do |config|
         haproxy_config.vm.hostname = "haproxy"
         haproxy_config.vm.network :forwarded_port, guest: 80, host: 8080
         haproxy_config.vm.network "private_network", ip: "192.168.33.70"
-        haproxy_config.vm.provision "file", source: "./haproxy/haproxy.cfg", destination: "haproxy.cfg"
         haproxy_config.vm.provision :shell, path: "haproxy/haproxy.sh"
     end
     # Configs for haproxy
-    config.vm.define :waf1 do |waf1_config|
-        waf1_config.vm.provider :virtualbox do |vb_config|
-            vb_config.name = "WAF 1"
+    config.vm.define :waf do |waf_config|
+        waf_config.vm.provider :virtualbox do |vb_config|
+            vb_config.name = "WAF"
         end
-        waf1_config.vm.hostname = "waf1"
-        waf1_config.vm.network "private_network", ip: "192.168.33.60"
-        waf1_config.vm.provision "file", source: "./waf/httpd.conf", destination: "httpd.conf"
-        waf1_config.vm.provision :shell, path: "waf/waf.sh"
+        waf_config.vm.hostname = "waf"
+        waf_config.vm.network "private_network", ip: "192.168.33.60"
+        waf_config.vm.provision "file", source: "./waf/httpd.conf", destination: "httpd.conf"
+        waf_config.vm.provision "file", source: "./waf/mod_rpaf.conf", destination: "mod_rpaf.conf"
+        waf_config.vm.provision "file", source: "./waf/aloha.conf", destination: "aloha.conf"
+        waf_config.vm.provision "file", source: "./waf/security2.conf", destination: "security2.conf"
+        waf_config.vm.provision "file", source: "./waf/mod_security.conf", destination: "mod_security.conf"
+        waf_config.vm.provision :shell, path: "waf/waf.sh"
+    end
+    config.vm.define :test do |test_config|
+        test_config.vm.provider :virtualbox do |vb_config|
+            vb_config.name = "TEST"
+        end
+        test_config.vm.hostname = "test"
+        test_config.vm.network "private_network", ip: "192.168.33.30"
     end
 end
