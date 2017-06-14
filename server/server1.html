@@ -1,9 +1,85 @@
 <html>
 <head>
-<title>SERVER1</title>
+	<title>SERVER1</title>
+	<meta charset="UTF-8">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 </head>
-<body>
-<h1>SERVER1</h1>
-<p>Hi sir, I am going to serve you today!</p>
+<body class="col-md-offset-2 col-md-8">
+	<h2>SERVER1</h2>
+	<p>Hi sir, I am going to serve you today!</p>
+
+	<!-- XSS -->
+	<div class="alert alert-info col-md-12">
+		<h3>Take note</h3>
+		<form id="add-note-form" method="post">
+			<div class="form-group">
+		    	<textarea class="col-md-12" id="note" name="note" form="add-note-form">Enter your note here...</textarea>
+			</div>
+			<button type="button" id="safeInsert" class="btn btn-primary">SECURE INSERT </button>
+			<button type="button" id="dangerInsert" class="btn btn-danger">DANGER INSERT </button>
+		</form>
+	</div>
+
+	<!-- SQL Injection -->
+	<div class="alert alert-info col-md-12">
+		<h3>Notes</h3>
+		<form id="search-form" method="post">
+			<div class="form-group col-md-10">
+		    	<input type="text" class="form-control" id="search" name="search">
+			</div>
+		 	<button type="button" id="safeSearch" class="btn btn-primary">SECURE SEARCH <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+			<button type="button" id="dangerSearch" class="btn btn-danger">DANGER SEARCH <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+		</form>
+	</div>
+	<div class="alert alert-info col-md-12">
+		<ul id='notes' class="list-group">
+		</ul>
+	</div>
+	<script type="text/javascript">
+		document.getElementById("safeSearch").onclick = function() {
+			search('192.168.17.70');
+		};
+		document.getElementById("dangerSearch").onclick = function() {
+			search('192.168.17.50');
+		};
+		function search (ip) {
+			$.ajax({
+				type: "GET",
+				url : 'http://' +  ip + '/notes?notes=' + $('input#search').val(),
+				success : function (response) {
+					var list = "";
+					for(i=0; i<response.length; i++){
+        				list +="<li class='list-group-item list-group-item-info'>"+response[i].note+"</li>";
+        			}
+        			$('#notes').empty().append(list);
+				}
+			})
+		}
+
+		document.getElementById("safeInsert").onclick = function() {
+			insert('192.168.17.70');
+		};
+		document.getElementById("dangerInsert").onclick = function() {
+			insert('192.168.17.50');
+		};
+		function insert (ip) {
+			var data = {};
+ 			data.note = $('textarea#note').val();
+			$.ajax({
+				type: "POST",
+				url : 'http://' +  ip + '/add_note',
+				data: "note="+data.note,
+				success : function (response) {
+					console.log("The server says: " + response);
+				}
+			})
+		}
+	</script>
 </body>
 </html>
