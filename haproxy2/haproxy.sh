@@ -17,14 +17,8 @@ EOD
       timeout connect 5000ms
       timeout client 50000ms
       timeout server 50000ms
-  frontend haproxy_front
-      bind 192.168.17.70:80
-      default_backend waf_back
-  backend waf_back
-      balance roundrobin
-      server waf 192.168.17.60:80 maxconn 32 check
   frontend webservers_front
-      bind 192.168.17.70:81
+      bind 192.168.17.50:80
       default_backend webservers_back
   backend webservers_back
       balance roundrobin

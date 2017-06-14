@@ -13,7 +13,7 @@
 <body class="col-md-offset-2 col-md-8">
 	<h2>SERVER1</h2>
 	<p>Hi sir, I am going to serve you today!</p>
-	
+
 	<!-- XSS -->
 	<div class="alert alert-info col-md-12">
 		<h3>Take note</h3>
@@ -32,7 +32,8 @@
 			<div class="form-group col-md-10">
 		    	<input type="text" class="form-control" id="search" name="search">
 			</div>
-		 	<button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+		 	<button type="button" id="safeSearch" class="btn btn-primary">SECURE SEARCH <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+			<button type="button" id="dangerSearch" class="btn btn-danger">DANGER SEARCH <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
 		</form>
 	</div>
 
@@ -40,50 +41,22 @@
 		<ul id='notes' class="list-group">
 		</ul>
 	</div>
-</body>
-</html>
-
-<script type="text/javascript">
-	$(document).ready( function() {
-		$('#notes').hide();
-	});
-	$('#add-note-form')
-		.on( "submit", function(e) {
-			e.preventDefault();
-			var data = {};
-			data.note = $("textarea#note").val();
-			console.log(data);
-            $.ajax({
-            	type: "POST",
-				url : 'http://192.168.33.80:80/add_note',
-				data: JSON.stringify(data),
-				contentType: 'application/json',
+	<script type="text/javascript">
+		document.getElementById("safeSearch").onclick = function() {
+			search('192.168.17.70');
+		};
+		document.getElementById("dangerSearch").onclick = function() {
+			search('192.168.17.50');
+		};
+		function search (ip) {
+			$.ajax({
+				type: "GET",
+				url : 'http://' +  ip + '/notes?notes=' + $('input#search').val(),
 				success : function (response) {
 					console.log("The server says: " + response);
 				}
-			});
-		});
-
-	$('#search-form')
-		.on( "submit", function(e) {
-			e.preventDefault();
-			var data = {};
-			data.search = $('input#search').val();
-			console.log(data.search);
-            $.ajax({
-            	type: "POST",
-				url : 'http://192.168.33.80:80/notes',
-				data: JSON.stringify(data),
-				contentType: 'application/json',
-				success : function (response) {
-					console.log(response);
-				}
-			});
-		});
-</script>
-
-
-
-
-
-<li class="list-group-item list-group-item-info"></li></ul>
+			})
+		}
+	</script>
+</body>
+</html>

@@ -2,6 +2,17 @@ var http = require('http'),
     fs = require('fs'),
     Sequelize = require('sequelize');
 
+
+function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+        results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+};
+
 function serve(ip, port) {
   fs.readFile('server.html', function (err, html) {
       if (err) {
@@ -15,9 +26,20 @@ function serve(ip, port) {
       db.sync().then(function (orm) {
           http.createServer(function(request, response) {
             if (request.method == 'GET') {
-                response.writeHeader(200, {"Content-Type": "text/html"});  
-                response.write(html);  
-                response.end();
+                var url = require('url').parse(request.url);
+                if (url.pathname == '/notes') {
+                  var filter = getParameterByName("notes", request.url);
+                  console.log(filter);
+                  orm.query("SELECT * FROM notes WHERE note LIKE '%"+ filter + "%';").then(function (values) {
+                      response.writeHeader(200, {"Content-Type": "application/json"});
+                      response.write(JSON.stringify(values[0], null, 2));
+                      response.end();
+                  });
+                } else {
+                  response.writeHeader(200, {"Content-Type": "text/html"});
+                  response.write(html);
+                  response.end();
+                }
             }
             if (request.method == 'POST') {
                 var body = '';
@@ -36,7 +58,7 @@ function serve(ip, port) {
                             break;
 
                         case '/notes':
-                            orm.query('SELECT * FROM notes WHERE note LIKE "%' + parsedBody.search + '%";').then(function (values) {
+                            orm.query("SELECT * FROM notes WHERE note LIKE '%" + parsedBody.search + "%';").then(function (values) {
                                 response.writeHeader(200, {"Content-Type": "application/json"});
                                 response.write(JSON.stringify(values[0], null, 2));
                                 response.end();
@@ -163,8 +185,8 @@ function serve(ip, port) {
                                 response.writeHead(200, "OK", {'Content-Type': 'text/plain'});
                                 response.end();
                             });
-                        });  
-                        
+                        });
+
                         break;
 
                     case '/notes':
@@ -174,11 +196,11 @@ function serve(ip, port) {
                                 response.write(JSON.stringify(values[0], null, 2));
                                 response.end();
                             });
-                        });  
+                        });
 
                     default:
-                        response.writeHeader(200, {"Content-Type": "text/html"});  
-                        response.write(html);  
+                        response.writeHeader(200, {"Content-Type": "text/html"});
+                        response.write(html);
                         response.end();
                 }
             }).listen(port, ip);
