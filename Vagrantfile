@@ -45,6 +45,7 @@ Vagrant.configure("2") do |config|
         waf_config.vm.provision "file", source: "./waf/httpd.conf", destination: "httpd.conf"
         waf_config.vm.provision "file", source: "./waf/mod_security.conf", destination: "mod_security.conf"
         waf_config.vm.provision "file", source: "./waf/modsecurity.conf", destination: "modsecurity.conf"
+        waf_config.vm.provision "file", source: "./waf/error.html", destination: "error.html"
         waf_config.vm.provision :shell, path: "waf/waf.sh"
     end
 

@@ -18,12 +18,15 @@ ln -s /usr/share/modsecurity-crs/base_rules/modsecurity_crs_41_sql_injection_att
 ln -s /usr/share/modsecurity-crs/base_rules/modsecurity_crs_30_http_policy.conf /usr/share/modsecurity-crs/activated_rules/
 service apache2 reload
 
+mkdir /var/www/error
+
 echo -e "Changing mode to proxy"
 sudo a2enmod proxy
 sudo a2enmod proxy_http
 
 echo -e "Copying configuration"
 cat httpd.conf >> /etc/apache2/apache2.conf
+cp error.html /var/www/error/error.html
 
 echo -e "Reloading apache2 service"
 sudo service apache2 restart
