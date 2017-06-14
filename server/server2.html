@@ -21,70 +21,65 @@
 			<div class="form-group">
 		    	<textarea class="col-md-12" id="note" name="note" form="add-note-form">Enter your note here...</textarea>
 			</div>
-		 	<button type="submit" class="btn btn-primary">Submit</button>
+			<button type="button" id="safeInsert" class="btn btn-primary">SECURE INSERT </button>
+			<button type="button" id="dangerInsert" class="btn btn-danger">DANGER INSERT </button>
 		</form>
 	</div>
 
 	<!-- SQL Injection -->
 	<div class="alert alert-info col-md-12">
 		<h3>Notes</h3>
-		<form id="search-form" method="GET">
+		<form id="search-form" method="post">
 			<div class="form-group col-md-10">
 		    	<input type="text" class="form-control" id="search" name="search">
 			</div>
-		 	<button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-			<button type="button" class="btn btn-danger"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+		 	<button type="button" id="safeSearch" class="btn btn-primary">SECURE SEARCH <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+			<button type="button" id="dangerSearch" class="btn btn-danger">DANGER SEARCH <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
 		</form>
 	</div>
-
-	<div>
+	<div class="alert alert-info col-md-12">
 		<ul id='notes' class="list-group">
 		</ul>
 	</div>
-</body>
-</html>
+	<script type="text/javascript">
+		document.getElementById("safeSearch").onclick = function() {
+			search('192.168.17.70');
+		};
+		document.getElementById("dangerSearch").onclick = function() {
+			search('192.168.17.50');
+		};
+		function search (ip) {
+			$.ajax({
+				type: "GET",
+				url : 'http://' +  ip + '/notes?notes=' + $('input#search').val(),
+				success : function (response) {
+					var list = "";
+					for(i=0; i<response.length; i++){
+        				list +="<li class='list-group-item list-group-item-info'>"+response[i].note+"</li>";
+        			}
+        			$('#notes').empty().append(list);
+				}
+			})
+		}
 
-<script type="text/javascript">
-	$(document).ready( function() {
-		$('#notes').hide();
-	});
-	$('#add-note-form')
-		.on( "submit", function(e) {
-			e.preventDefault();
+		document.getElementById("safeInsert").onclick = function() {
+			insert('192.168.17.70');
+		};
+		document.getElementById("dangerInsert").onclick = function() {
+			insert('192.168.17.50');
+		};
+		function insert (ip) {
 			var data = {};
-			data.note = $("textarea#note").val();
-			console.log(data);
-            $.ajax({
-            	type: "POST",
-				url : 'http://192.168.17.80:80/add_note',
-				data: JSON.stringify(data),
-				contentType: 'application/json',
+ 			data.note = $('textarea#note').val();
+			$.ajax({
+				type: "POST",
+				url : 'http://' +  ip + '/add_note',
+				data: "note="+data.note,
 				success : function (response) {
 					console.log("The server says: " + response);
 				}
-			});
-		});
-
-	$('#search-form')
-		.on( "submit", function(e) {
-			e.preventDefault();
-			var data = {};
-			data.search = $('input#search').val();
-			console.log(data.search);
-            $.ajax({
-            	type: "POST",
-				url : 'http://192.168.17.80:80/notes',
-				data: JSON.stringify(data),
-				contentType: 'application/json',
-				success : function (response) {
-					console.log(response);
-				}
-			});
-		});
-</script>
-
-
-
-
-
-<li class="list-group-item list-group-item-info"></li></ul>
+			})
+		}
+	</script>
+</body>
+</html>
